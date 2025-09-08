@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Embarazo Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .pregnancy-test {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .pregnancy-test:hover:not(.disabled) {
+            transform: scale(1.05);
+        }
+        .disabled {
+            cursor: not-allowed;
+        }
+        #result-line-2 {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .loader {
+            border-top-color: #ec4899;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-pink-50 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="app-container" class="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg text-center">
+        
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Prueba de Embarazo Digital</h1>
+        
+        <p id="instruction" class="text-gray-500 mb-6">Haz clic en la prueba para ver el resultado.</p>
+        
+        <!-- Contenedor para la prueba y el loader -->
+        <div class="relative w-full h-48 flex items-center justify-center">
+            
+            <!-- SVG de la prueba de embarazo -->
+            <div id="test-container" class="pregnancy-test">
+                <svg width="250" height="70" viewBox="0 0 250 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cuerpo de la prueba -->
+                    <rect x="0" y="10" width="250" height="50" rx="25" fill="#F3F4F6"/>
+                    <rect x="0" y="10" width="250" height="50" rx="25" stroke="#E5E7EB" stroke-width="2"/>
+                    <!-- Ventana de resultado -->
+                    <rect x="50" y="20" width="70" height="30" rx="5" fill="white" stroke="#D1D5DB" stroke-width="2"/>
+                    <!-- Línea de control (siempre visible) -->
+                    <line x1="70" y1="25" x2="70" y2="45" stroke="#F472B6" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Línea de resultado (inicialmente oculta) -->
+                    <line id="result-line-2" x1="95" y1="25" x2="95" y2="45" stroke="#F472B6" stroke-width="4" stroke-linecap="round" class="opacity-0"/>
+                </svg>
+            </div>
+            
+            <!-- Loader -->
+            <div id="loader" class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24 absolute hidden"></div>
+        </div>
+
+        <!-- Mensaje de resultado -->
+        <div id="result-message" class="mt-6 h-16">
+            <h2 id="result-text" class="text-3xl font-bold transition-opacity duration-500 opacity-0"></h2>
+        </div>
+        
+        <!-- Botón para reiniciar -->
+        <button id="reset-button" class="mt-4 bg-pink-500 text-white font-bold py-2 px-6 rounded-full hover:bg-pink-600 transition-all duration-300 transform scale-0">
+            Hacer otra prueba
+        </button>
+
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="https://www.youtube.com/watch?v=J5dgN4CEg-8" target="_blank" rel="noopener noreferrer" class="text-lg font-bold text-pink-500 hover:text-pink-700 transition-colors duration-300 animate-pulse">
+            ¡¡mi patita mami!!
+        </a>
+    </div>
+
+    <script>
+        const testContainer = document.getElementById('test-container');
+        const instruction = document.getElementById('instruction');
+        const loader = document.getElementById('loader');
+        const resultLine2 = document.getElementById('result-line-2');
+        const resultText = document.getElementById('result-text');
+        const resetButton = document.getElementById('reset-button');
+        const appContainer = document.getElementById('app-container');
+
+        // Función para manejar el clic en la prueba
+        const startTest = () => {
+            // Deshabilitar más clics
+            testContainer.classList.add('disabled');
+            testContainer.removeEventListener('click', startTest);
+            
+            // Ocultar instrucción y mostrar loader
+            instruction.classList.add('opacity-0');
+            testContainer.classList.add('opacity-0');
+            loader.classList.remove('hidden');
+
+            // Simular el tiempo de espera del resultado
+            setTimeout(() => {
+                // Decidir el resultado aleatoriamente
+                const isPregnant = Math.random() < 0.5;
+
+                // Ocultar loader
+                loader.classList.add('hidden');
+                
+                // Mostrar la prueba de nuevo
+                testContainer.classList.remove('opacity-0');
+
+                if (isPregnant) {
+                    resultLine2.classList.remove('opacity-0');
+                    resultText.textContent = '¡Resultado Positivo!';
+                    resultText.classList.add('text-pink-500');
+                    appContainer.classList.add('shadow-pink-200');
+
+                } else {
+                    resultText.textContent = 'Resultado Negativo';
+                    resultText.classList.add('text-gray-600');
+                    appContainer.classList.add('shadow-gray-200');
+                }
+                
+                resultText.classList.remove('opacity-0');
+                resetButton.classList.remove('scale-0');
+                resetButton.classList.add('scale-100');
+
+            }, 3000); // 3 segundos de espera
+        };
+
+        // Función para reiniciar la prueba
+        const resetTest = () => {
+            testContainer.classList.remove('disabled');
+            testContainer.addEventListener('click', startTest);
+            
+            instruction.classList.remove('opacity-0');
+            
+            resultLine2.classList.add('opacity-0');
+            resultText.classList.add('opacity-0');
+            resetButton.classList.remove('scale-100');
+            resetButton.classList.add('scale-0');
+            
+            // Limpiar clases de estado
+            setTimeout(() => {
+                resultText.textContent = '';
+                resultText.classList.remove('text-pink-500', 'text-gray-600');
+                appContainer.classList.remove('shadow-pink-200', 'shadow-gray-200');
+            }, 500);
+        };
+
+        // Asignar eventos iniciales
+        testContainer.addEventListener('click', startTest);
+        resetButton.addEventListener('click', resetTest);
+    </script>
+
+</body>
+</html>
